@@ -599,7 +599,7 @@ public class StarryView extends View {
     }
 
     /**
-     * 图片资源释放
+     * 资源释放
      */
     private void releaseValueAnimator() {
         valueAnimator1 = null;
