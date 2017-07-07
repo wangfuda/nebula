@@ -125,7 +125,7 @@ public class StarryView extends View {
      */
     private String[] appNameInner = {"Facebook", "Twitter", "Instagram", "Snapshot", "Whatapp", "Youtube"};
     private String[] appNameOuter = {"Gmail", "Aello", "Photo", "Message", "CleanMaster", "momoda"};
-    private String[] appNameInnerTmp,appNameOuterTmp;
+    private String[] appNameInnerTmp, appNameOuterTmp;
     /**
      * app名称旋转角度
      */
@@ -194,14 +194,15 @@ public class StarryView extends View {
      */
     public void pauseAnimation() {
         try {
-            valueAnimator1.pause();
-            valueAnimator2.pause();
-            valueAnimator3.pause();
-            valueAnimator4.pause();
-            valueAnimator5.pause();
-            valueAnimator6.pause();
-            valueAnimator7.pause();
-            valueAnimator8.pause();
+            if (valueAnimator1 != null) valueAnimator1.pause();
+            if (valueAnimator2 != null) valueAnimator2.pause();
+            if (valueAnimator3 != null) valueAnimator3.pause();
+            if (valueAnimator4 != null) valueAnimator4.pause();
+            if (valueAnimator5 != null) valueAnimator5.pause();
+            if (valueAnimator6 != null) valueAnimator6.pause();
+            if (valueAnimator7 != null) valueAnimator7.pause();
+            if (valueAnimator8 != null) valueAnimator8.pause();
+            if (valueAnimator9 != null) valueAnimator9.pause();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -211,36 +212,32 @@ public class StarryView extends View {
      * 恢复全部动画
      */
     public void resumeAnimation() {
-        try {
-            valueAnimator1.resume();
-            valueAnimator2.resume();
-            valueAnimator3.resume();
-            valueAnimator4.resume();
-            valueAnimator5.resume();
-            valueAnimator6.resume();
-            valueAnimator7.resume();
-            valueAnimator8.resume();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        if (valueAnimator1 != null) valueAnimator1.resume();
+        if (valueAnimator2 != null) valueAnimator2.resume();
+        if (valueAnimator3 != null) valueAnimator3.resume();
+        if (valueAnimator4 != null) valueAnimator4.resume();
+        if (valueAnimator5 != null) valueAnimator5.resume();
+        if (valueAnimator6 != null) valueAnimator6.resume();
+        if (valueAnimator7 != null) valueAnimator7.resume();
+        if (valueAnimator8 != null) valueAnimator8.resume();
+        if (valueAnimator9 != null) valueAnimator9.resume();
     }
 
     /**
      * 停止全部动画
      */
     public void stopAnimation() {
-        try {
-            valueAnimator1.end();
-            valueAnimator2.end();
-            valueAnimator3.end();
-            valueAnimator4.end();
-            valueAnimator5.end();
-            valueAnimator6.end();
-            valueAnimator7.end();
-            valueAnimator8.end();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        if (valueAnimator1 != null) valueAnimator1.end();
+        if (valueAnimator2 != null) valueAnimator2.end();
+        if (valueAnimator3 != null) valueAnimator3.end();
+        if (valueAnimator4 != null) valueAnimator4.end();
+        if (valueAnimator5 != null) valueAnimator5.end();
+        if (valueAnimator6 != null) valueAnimator6.end();
+        if (valueAnimator7 != null) valueAnimator7.end();
+        if (valueAnimator8 != null) valueAnimator8.end();
+        if (valueAnimator9 != null) valueAnimator9.end();
+
     }
 
     /**
