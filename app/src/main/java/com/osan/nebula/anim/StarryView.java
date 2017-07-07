@@ -32,8 +32,8 @@ public class StarryView extends View {
 
     private static final String TAG = "StarryView";
 
-    private int scwidth;
-    private int scheight;
+    private int scwidth, halfWidth, thirdWidth,vortexHalfWidth;
+    private int scheight, halfHeight,vortexHalfHeight;
 
     private Paint paintBg = new Paint();
     private Paint paintSky = new Paint();
@@ -115,6 +115,13 @@ public class StarryView extends View {
 
     private int appNameIndex = 0;
 
+    private Rect srcVortex, srcBg, src_sky_layer1, src_sky_layer2, dst_sky_layer2, srcLight, src_vortex, srcparticallevel1;
+    private RectF dstFVortex, dstBg, dst_sky_layer1, dstLight, dst_vortex, dstparticallevel1;
+    private RectF dst_bg;
+    private ColorMatrix cMatrix;
+    private float sqrtMask;
+    private float halfMask;
+
 
     public StarryView(Context context) {
         this(context, null);
@@ -129,51 +136,67 @@ public class StarryView extends View {
 
         initValue();
 
+        initPaint();
+
         initBitmap();
 
         initAnimation();
+
+        initData();
     }
 
     /**
      * 暂停全部动画
      */
     public void pauseAnimation() {
-        valueAnimator1.pause();
-        valueAnimator2.pause();
-        valueAnimator3.pause();
-        valueAnimator4.pause();
-        valueAnimator5.pause();
-        valueAnimator6.pause();
-        valueAnimator7.pause();
-        valueAnimator8.pause();
+        try {
+            valueAnimator1.pause();
+            valueAnimator2.pause();
+            valueAnimator3.pause();
+            valueAnimator4.pause();
+            valueAnimator5.pause();
+            valueAnimator6.pause();
+            valueAnimator7.pause();
+            valueAnimator8.pause();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 恢复全部动画
      */
     public void resumeAnimation() {
-        valueAnimator1.resume();
-        valueAnimator2.resume();
-        valueAnimator3.resume();
-        valueAnimator4.resume();
-        valueAnimator5.resume();
-        valueAnimator6.resume();
-        valueAnimator7.resume();
-        valueAnimator8.resume();
+        try {
+            valueAnimator1.resume();
+            valueAnimator2.resume();
+            valueAnimator3.resume();
+            valueAnimator4.resume();
+            valueAnimator5.resume();
+            valueAnimator6.resume();
+            valueAnimator7.resume();
+            valueAnimator8.resume();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 停止全部动画
      */
     public void stopAnimation() {
-        valueAnimator1.end();
-        valueAnimator2.end();
-        valueAnimator3.end();
-        valueAnimator4.end();
-        valueAnimator5.end();
-        valueAnimator6.end();
-        valueAnimator7.end();
-        valueAnimator8.end();
+        try {
+            valueAnimator1.end();
+            valueAnimator2.end();
+            valueAnimator3.end();
+            valueAnimator4.end();
+            valueAnimator5.end();
+            valueAnimator6.end();
+            valueAnimator7.end();
+            valueAnimator8.end();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -186,6 +209,81 @@ public class StarryView extends View {
         wm.getDefaultDisplay().getMetrics(metric);
         scwidth = metric.widthPixels;     // 屏幕宽度（像素）
         scheight = metric.heightPixels;   // 屏幕高度（像素）
+        halfWidth = scwidth / 2;
+        halfHeight = scheight / 2;
+        thirdWidth = scwidth / 3;
+
+        sqrtMask = (float) Math.sqrt(3) / 2 * radiusMask;
+        halfMask = radiusMask / 2;
+
+    }
+
+    private void initData() {
+
+        vortexHalfWidth = vortex.getWidth() / 2;
+        vortexHalfHeight = vortex.getHeight() / 2;
+
+        srcVortex = new Rect(0, 0, vortex.getWidth(), vortex.getHeight());
+        dstFVortex = new RectF(0, 0, 0, 0);
+
+        srcBg = new Rect(0, 0, bg.getWidth(), bg.getHeight());
+        dstBg = new RectF(-halfWidth, -halfHeight, halfWidth, halfHeight);
+
+        src_sky_layer1 = new Rect(0, 0, sky_layer1.getWidth(), sky_layer1.getHeight());
+        dst_sky_layer1 = new RectF(-halfWidth, -halfHeight, halfWidth, halfHeight);
+        src_sky_layer2 = new Rect(0, 0, sky_layer2.getWidth(), sky_layer2.getHeight());
+        dst_sky_layer2 = new Rect(-thirdWidth, -thirdWidth, thirdWidth, thirdWidth);
+
+        srcLight = new Rect(0, 0, light.getWidth(), light.getHeight());
+        float tempX = light.getWidth() / 2;
+        float tempY = light.getHeight() / 2;
+        dstLight = new RectF(-tempX, -tempY, tempX, tempY);
+
+        src_vortex = new Rect(0, 0, vortex.getWidth(), vortex.getHeight());
+        dst_vortex = new RectF(0, 0, 0, 0);
+
+        cMatrix = new ColorMatrix();
+
+        dst_bg = new RectF(0, 0, 0, 0);
+
+        srcparticallevel1 = new Rect(0, 0, particallevel1.getWidth(), particallevel1.getHeight());
+        dstparticallevel1 = new RectF(0, 0, 0, 0);
+
+    }
+
+    /**
+     * 初始化画笔
+     */
+    private void initPaint() {
+
+        paintCircleSolid.setColor(this.getContext().getResources().getColor(R.color.mask_bg_color));
+        paintCircleSolid.setAntiAlias(true);
+        //绘制水波纹(双层:实心半透黑色波纹+加速放大灰白色水波纹)
+        paintCircleHollow.setColor(this.getContext().getResources().getColor(R.color.circle_color));
+        paintCircleHollow.setStrokeWidth(circleStroke);
+        paintCircleHollow.setStyle(Paint.Style.STROKE);
+        paintCircleHollow.setAntiAlias(true);
+
+        paintCircleStar.setColor(this.getContext().getResources().getColor(R.color.star_color));
+        paintCircleStar.setAntiAlias(true);
+        //需关闭硬件加速才能生效
+        paintCircleStar.setMaskFilter(new BlurMaskFilter(10, BlurMaskFilter.Blur.SOLID));
+
+        paintText.setAntiAlias(true);
+        paintText.setTextSize(textSize);
+        paintText.setColor(Color.GRAY);
+        paintText.setTextAlign(Paint.Align.CENTER);
+        paintTextTmp.setAntiAlias(true);
+        paintTextTmp.setTextSize(textSize);
+        paintTextTmp.setColor(Color.GRAY);
+        paintTextTmp.setTextAlign(Paint.Align.CENTER);
+
+        //app小水波纹画笔
+        paintWave1.setColor(this.getContext().getResources().getColor(R.color.wave_color));
+        paintWave1.setStrokeWidth(circleStroke);
+        paintWave1.setStyle(Paint.Style.STROKE);
+        paintWave1.setAntiAlias(true);
+
     }
 
     /**
@@ -194,18 +292,37 @@ public class StarryView extends View {
     private void initBitmap() {
         BitmapFactory.Options localOptions = new BitmapFactory.Options();
         localOptions.inSampleSize = 1;
-        vortex = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.vortex, localOptions);
-        sky_layer1 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.sky_layer1, localOptions);
-        sky_layer2 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.sky_layer2, localOptions);
+
         light = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.light, localOptions);
-        bg = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.bg, localOptions);
+
+        vortex = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.vortex, localOptions);
+        sky_layer2 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.sky_layer2, localOptions);
 
         particallevel1 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.particallevel1, localOptions);
-        particallevel2 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.particallevel2, localOptions);
-        particallevel3 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.particallevel3, localOptions);
-        particallevel4 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.particallevel4, localOptions);
+//        particallevel2 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.particallevel2, localOptions);
+//        particallevel3 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.particallevel3, localOptions);
+//        particallevel4 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.particallevel4, localOptions);
+
+        localOptions.inSampleSize = 2;
+        localOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+        sky_layer1 = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.sky_layer1, localOptions);
+        bg = BitmapFactory.decodeResource(this.getContext().getResources(), R.mipmap.bg, localOptions);
     }
 
+    /**
+     * 图片资源释放
+     */
+    private void releaseBitmap() {
+        vortex.recycle();
+        vortex = null;
+        sky_layer1.recycle();
+        sky_layer1 = null;
+        sky_layer2.recycle();
+        sky_layer2 = null;
+        light.recycle();
+        light = null;
+
+    }
 
     /**
      * 简化动画, 简化为一个ValueAnimator
@@ -301,6 +418,10 @@ public class StarryView extends View {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 mValue6 = (float) valueAnimator.getAnimatedValue();
+                if (mValue6 == 1.f) {
+                    releaseBitmap();
+                    releaseValueAnimator();
+                }
                 invalidate();   // 重绘
             }
         });
@@ -317,7 +438,7 @@ public class StarryView extends View {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 mValue7 = (float) valueAnimator.getAnimatedValue();
                 if (mValue7 == 0) {
-                    appNameIndex +=5;
+                    appNameIndex += 5;
                 }
                 invalidate();   // 重绘
             }
@@ -381,6 +502,17 @@ public class StarryView extends View {
         valueAnimator9.setDuration(timeNinthStep);
         valueAnimator9.setRepeatCount(ValueAnimator.INFINITE);
         valueAnimator9.setRepeatMode(ValueAnimator.RESTART);
+    }
+
+    /**
+     * 图片资源释放
+     */
+    private void releaseValueAnimator() {
+        valueAnimator1 = null;
+        valueAnimator2 = null;
+        valueAnimator3 = null;
+        valueAnimator4 = null;
+        valueAnimator5 = null;
     }
 
 
@@ -460,18 +592,14 @@ public class StarryView extends View {
      */
     private void drawState1(Canvas canvas) {
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
-
-        Rect src = new Rect(0, 0, vortex.getWidth(), vortex.getHeight());
+        canvas.translate(halfWidth, halfHeight);
 
         float scale = (mValue1 * 9) + 1; // 缩放比例 1 - 4
-        float tempX = vortex.getWidth() / 2 * scale;
-        float tempY = vortex.getHeight() / 2 * scale;
-        RectF dst = new RectF(-tempX, -tempY, tempX, tempY);
+        float tempX = vortexHalfWidth * scale;
+        float tempY = vortexHalfHeight * scale;
+        dstFVortex.set(-tempX, -tempY, tempX, tempY);
 
-        //canvas.drawARGB(0xaa, 0xff, 0xff, 0xff);
-
-        canvas.drawBitmap(vortex, src, dst, paint);
+        canvas.drawBitmap(vortex, srcVortex, dstFVortex, paint);
 
         canvas.restore();
     }
@@ -494,11 +622,8 @@ public class StarryView extends View {
         }
 
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
-
-        Rect src_bg = new Rect(0, 0, bg.getWidth(), bg.getHeight());
-        RectF dst_bg = new RectF(-scwidth / 2, -scheight / 2, scwidth / 2, scheight / 2);
-        canvas.drawBitmap(bg, src_bg, dst_bg, paintBg);
+        canvas.translate(halfWidth, halfHeight);
+        canvas.drawBitmap(bg, srcBg, dstBg, paintBg);
 
         canvas.restore();
 
@@ -516,33 +641,25 @@ public class StarryView extends View {
         float scale = (tempValue * 4) + 1;         // 缩放比例 1 - 3
 
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.scale(scale, scale);              // 放大
 
-        Rect src_sky_layer1 = new Rect(0, 0, sky_layer1.getWidth(), sky_layer1.getHeight());
-        RectF dst_sky_layer1 = new RectF(-scwidth / 2, -scheight / 2, scwidth / 2, scheight / 2);
         canvas.drawBitmap(sky_layer1, src_sky_layer1, dst_sky_layer1, paintSky);
 
         canvas.rotate(tempValue * 720f);          // 旋转
 
-        Rect src_sky_layer2 = new Rect(0, 0, sky_layer2.getWidth(), sky_layer2.getHeight());
-        Rect dst_sky_layer2 = new Rect(-scwidth / 3, -scwidth / 3, scwidth / 3, scwidth / 3);
         canvas.drawBitmap(sky_layer2, src_sky_layer2, dst_sky_layer2, paintSky);
 
         canvas.restore();
 
-
         // 绘制light
         canvas.save();
         float tempScale = (tempValue * 8);        // 缩放比例 0 - 4
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.scale(tempScale, tempScale);      // 缩放
 
-        Rect src_light = new Rect(0, 0, light.getWidth(), light.getHeight());
-        float tempX = light.getWidth() / 2;
-        float tempY = light.getHeight() / 2;
-        RectF dst_light = new RectF(-tempX, -tempY, tempX, tempY);
-        canvas.drawBitmap(light, src_light, dst_light, paintSky);
+
+        canvas.drawBitmap(light, srcLight, dstLight, paintSky);
 
         canvas.restore();
 
@@ -560,14 +677,9 @@ public class StarryView extends View {
 
         // 绘制 bg
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
-
-        Rect src_bg = new Rect(0, 0, bg.getWidth(), bg.getHeight());
-        RectF dst_bg = new RectF(-scwidth / 2, -scheight / 2, scwidth / 2, scheight / 2);
-        canvas.drawBitmap(bg, src_bg, dst_bg, paintBg);
-
+        canvas.translate(halfWidth, halfHeight);
+        canvas.drawBitmap(bg, srcBg, dstBg, paintBg);
         canvas.restore();
-
 
         // 绘制 sky_layer
         if (mValue3 < 0.55f) {
@@ -576,39 +688,23 @@ public class StarryView extends View {
             paintSky.setAlpha((int) (255 * (0.0f)));       // 设置了画笔透明度
         }
 
-
         float tempValue = mValue2 - mValue3;
         float scale = (tempValue * 4) + 1;         // 缩放比例 1 - 3
 
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.scale(scale, scale);              // 放大
-
-        Rect src_sky_layer1 = new Rect(0, 0, sky_layer1.getWidth(), sky_layer1.getHeight());
-        RectF dst_sky_layer1 = new RectF(-scwidth / 2, -scheight / 2, scwidth / 2, scheight / 2);
         canvas.drawBitmap(sky_layer1, src_sky_layer1, dst_sky_layer1, paintSky);
-
         canvas.rotate((mValue2 + mValue3) * 720f);          // 旋转
-
-        Rect src_sky_layer2 = new Rect(0, 0, sky_layer2.getWidth(), sky_layer2.getHeight());
-        Rect dst_sky_layer2 = new Rect(-scwidth / 3, -scwidth / 3, scwidth / 3, scwidth / 3);
         canvas.drawBitmap(sky_layer2, src_sky_layer2, dst_sky_layer2, paintSky);
-
         canvas.restore();
-
 
         // 绘制light
         canvas.save();
         float tempScale = (tempValue * 8);        // 缩放比例 0 - 4
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.scale(tempScale, tempScale);      // 缩放
-
-        Rect src_light = new Rect(0, 0, light.getWidth(), light.getHeight());
-        float tempX = light.getWidth() / 2;
-        float tempY = light.getHeight() / 2;
-        RectF dst_light = new RectF(-tempX, -tempY, tempX, tempY);
-        canvas.drawBitmap(light, src_light, dst_light, paintSky);
-
+        canvas.drawBitmap(light, srcLight, dstLight, paintSky);
         canvas.restore();
 
 
@@ -620,17 +716,12 @@ public class StarryView extends View {
         }
 
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
-
-        Rect src_vortex = new Rect(0, 0, vortex.getWidth(), vortex.getHeight());
-
+        canvas.translate(halfWidth, halfHeight);
         float scaleVortex = (mValue3 * 0.7f); // 缩放比例 0 - 0.7
-        float tempXVortex = vortex.getWidth() / 2 * scaleVortex;
-        float tempYVortex = vortex.getHeight() / 2 * scaleVortex;
-        RectF dst_vortex = new RectF(-tempXVortex, -tempYVortex, tempXVortex, tempYVortex);
-
+        float tempXVortex = vortexHalfWidth * scaleVortex;
+        float tempYVortex = vortexHalfHeight * scaleVortex;
+        dst_vortex.set(-tempXVortex, -tempYVortex, tempXVortex, tempYVortex);
         canvas.drawBitmap(vortex, src_vortex, dst_vortex, paint);
-
         canvas.restore();
 
 
@@ -647,7 +738,7 @@ public class StarryView extends View {
         // 绘制 bg
         float contrast = (1.f - mValue4 > 0.4f) ? (1.f - mValue4) : 0.4f;// 对比度
         float brightness = 0;// 亮度
-        ColorMatrix cMatrix = new ColorMatrix();
+
         cMatrix.set(new float[]{contrast, 0, 0, 0, brightness,
                 0, contrast, 0, 0, brightness,
                 0, 0, contrast, 0, brightness,
@@ -655,18 +746,13 @@ public class StarryView extends View {
 
         paintBg.setColorFilter(new ColorMatrixColorFilter(cMatrix));
 
-
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
-
-        Rect src_bg = new Rect(0, 0, bg.getWidth(), bg.getHeight());
+        canvas.translate(halfWidth, halfHeight);
         float scale = (mValue4 * 0.3f) + 1; // 缩放比例 1 - 1.3
-        float tempX = scwidth / 2 * scale;
-        float tempY = scheight / 2 * scale;
-        RectF dst_bg = new RectF(-tempX, -tempY, tempX, tempY);
-
-        canvas.drawBitmap(bg, src_bg, dst_bg, paintBg);
-
+        float tempX = halfWidth * scale;
+        float tempY = halfHeight * scale;
+        dst_bg.set(-tempX, -tempY, tempX, tempY);
+        canvas.drawBitmap(bg, srcBg, dst_bg, paintBg);
         canvas.restore();
     }
 
@@ -682,15 +768,12 @@ public class StarryView extends View {
 
         //绘制星团
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
-
-        Rect src_bg = new Rect(0, 0, particallevel1.getWidth(), particallevel1.getHeight());
+        canvas.translate(halfWidth, halfHeight);
         float scale = (mValue5 * 5f) + 1; // 缩放比例 1 - 6
-        float tempX = scwidth / 2 * scale;
-        float tempY = scheight / 2 * scale;
-        RectF dst_bg = new RectF(-tempX, -tempY, tempX, tempY);
-
-        canvas.drawBitmap(particallevel1, src_bg, dst_bg, paintBg);//共用背景画笔,保持对比度一致
+        float tempX = halfWidth * scale;
+        float tempY = halfHeight * scale;
+        dstparticallevel1.set(-tempX, -tempY, tempX, tempY);
+        canvas.drawBitmap(particallevel1, srcparticallevel1, dstparticallevel1, paintBg);//共用背景画笔,保持对比度一致
         canvas.restore();
     }
 
@@ -701,77 +784,60 @@ public class StarryView extends View {
      */
     private void drawState6(Canvas canvas) {
         //绘制水波纹(双层:实心半透黑色波纹+加速放大灰白色水波纹)
-        paintCircleHollow.setColor(this.getContext().getResources().getColor(R.color.circle_color));
-        paintCircleHollow.setStrokeWidth(circleStroke);
-        paintCircleHollow.setStyle(Paint.Style.STROKE);
-        paintCircleHollow.setAntiAlias(true);
         float radius2 = mValue6 * radiusSm;
         float radius3 = mValue6 * radiusLg;
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.drawCircle(0, 0, radius2, paintCircleHollow);
         canvas.drawCircle(0, 0, radius3, paintCircleHollow);
         canvas.restore();
 
-        paintCircleSolid.setColor(this.getContext().getResources().getColor(R.color.mask_bg_color));
-        paintCircleSolid.setAntiAlias(true);
         float radius = mValue6 * radiusMask;
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.drawCircle(0, 0, radius, paintCircleSolid);
         canvas.restore();
 
         if (mValue6 == mValueMax) {
 
-            paintCircleStar.setColor(this.getContext().getResources().getColor(R.color.star_color));
-            paintCircleStar.setAntiAlias(true);
-            //需关闭硬件加速才能生效
-            paintCircleStar.setMaskFilter(new BlurMaskFilter(10, BlurMaskFilter.Blur.SOLID));
-
-            paintText.setAntiAlias(true);
-            paintText.setTextSize(textSize);
-            paintText.setColor(Color.GRAY);
-            paintText.setTextAlign(Paint.Align.CENTER);
-            paintTextTmp.setAntiAlias(true);
-            paintTextTmp.setTextSize(textSize);
-            paintTextTmp.setColor(Color.GRAY);
-            paintTextTmp.setTextAlign(Paint.Align.CENTER);
-
-
-
             canvas.save();
             setLayerType(LAYER_TYPE_SOFTWARE, null);//关闭硬件加速
-            canvas.translate(scwidth / 2, scheight / 2);
+            canvas.translate(halfWidth, halfHeight);
             //绘制内圈星星
             canvas.drawCircle(-radius2, 0, radiusStar, paintCircleStar);
             canvas.drawCircle(radius2, 0, radiusStar, paintCircleStar);
-            canvas.drawCircle(-radius2 / 2, -(float) Math.sqrt(3) / 2 * radius2, radiusStar, paintCircleStar);
-            canvas.drawCircle(-radius2 / 2, (float) Math.sqrt(3) / 2 * radius2, radiusStar, paintCircleStar);
-            canvas.drawCircle(radius2 / 2, -(float) Math.sqrt(3) / 2 * radius2, radiusStar, paintCircleStar);
-            canvas.drawCircle(radius2 / 2, (float) Math.sqrt(3) / 2 * radius2, radiusStar, paintCircleStar);
+
+            float x = radius2 / 2;
+            float y = (float) Math.sqrt(3) / 2 * radius2;
+            canvas.drawCircle(-x, -y, radiusStar, paintCircleStar);
+            canvas.drawCircle(-x, y, radiusStar, paintCircleStar);
+            canvas.drawCircle(x, -y, radiusStar, paintCircleStar);
+            canvas.drawCircle(x, y, radiusStar, paintCircleStar);
             //绘制内圈星星名字
             canvas.drawText(appNameInner[0], -radius2, textVer, paintText);
             canvas.drawText(appNameInner[1], radius2, textVer, paintText);
-            canvas.drawText(appNameInner[2], -radius2 / 2, -(float) Math.sqrt(3) / 2 * radius2 + textVer, paintText);
-            canvas.drawText(appNameInner[3], -radius2 / 2, (float) Math.sqrt(3) / 2 * radius2 + textVer, paintText);
-            canvas.drawText(appNameInner[4], radius2 / 2, -(float) Math.sqrt(3) / 2 * radius2 + textVer, paintText);
-            canvas.drawText(appNameInner[5], radius2 / 2, (float) Math.sqrt(3) / 2 * radius2 + textVer, paintText);
+            canvas.drawText(appNameInner[2], -x, -y + textVer, paintText);
+            canvas.drawText(appNameInner[3], -x, y + textVer, paintText);
+            canvas.drawText(appNameInner[4], x, -y + textVer, paintText);
+            canvas.drawText(appNameInner[5], x, y + textVer, paintText);
 
             //绘制外圈星星
+            float xx = (float) Math.sqrt(3) / 2 * radius3;
+            float yy = radius3 / 2;
             canvas.drawCircle(0, -radius3, radiusStar, paintCircleStar);
             canvas.drawCircle(0, radius3, radiusStar, paintCircleStar);
-            canvas.drawCircle(-(float) Math.sqrt(3) / 2 * radius3, -radius3 / 2, radiusStar, paintCircleStar);
-            canvas.drawCircle(-(float) Math.sqrt(3) / 2 * radius3, radius3 / 2, radiusStar, paintCircleStar);
-            canvas.drawCircle((float) Math.sqrt(3) / 2 * radius3, -radius3 / 2, radiusStar, paintCircleStar);
-            canvas.drawCircle((float) Math.sqrt(3) / 2 * radius3, radius3 / 2, radiusStar, paintCircleStar);
+            canvas.drawCircle(-xx, -yy, radiusStar, paintCircleStar);
+            canvas.drawCircle(-xx, yy, radiusStar, paintCircleStar);
+            canvas.drawCircle(xx, -yy, radiusStar, paintCircleStar);
+            canvas.drawCircle(xx, yy, radiusStar, paintCircleStar);
 
             //绘制外圈星星名字
             canvas.drawText(appNameOuter[0], 0, -radius3 + textVer, paintText);
             canvas.drawText(appNameOuter[1], 0, radius3 + textVer, paintText);
-            canvas.drawText(appNameOuter[2], -(float) Math.sqrt(3) / 2 * radius3, -radius3 / 2 + textVer, paintText);
-            canvas.drawText(appNameOuter[2], -(float) Math.sqrt(3) / 2 * radius3, radius3 / 2 + textVer, paintText);
-            canvas.drawText(appNameOuter[2], (float) Math.sqrt(3) / 2 * radius3, -radius3 / 2 + textVer, paintText);
-            canvas.drawText(appNameOuter[2], (float) Math.sqrt(3) / 2 * radius3, radius3 / 2 + textVer, paintText);
+            canvas.drawText(appNameOuter[2], -xx, -yy + textVer, paintText);
+            canvas.drawText(appNameOuter[2], -xx, yy + textVer, paintText);
+            canvas.drawText(appNameOuter[2], xx, -yy + textVer, paintText);
+            canvas.drawText(appNameOuter[2], xx, yy + textVer, paintText);
 
 
             canvas.restore();
@@ -789,15 +855,9 @@ public class StarryView extends View {
         float radius3 = mValue6 * radiusLg;
 
         //绘制水波纹(双层:实心半透黑色波纹+加速放大灰白色水波纹)
-        paintCircleHollow.setColor(this.getContext().getResources().getColor(R.color.circle_color));
-        paintCircleHollow.setStrokeWidth(circleStroke);
-        paintCircleHollow.setStyle(Paint.Style.STROKE);
-        paintCircleHollow.setAntiAlias(true);
-
-
         //绘制内外圈
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         float scale = (mValue7 * 1.f) + 1;         // 缩放比例 1 - 2
         canvas.scale(scale, scale);
         canvas.rotate(mValue7 * 30f);
@@ -807,68 +867,58 @@ public class StarryView extends View {
 
         //绘制放大的第三圈
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         float scale3 = (mValue7 * 2.f) + 1;         // 缩放比例 1 - 2
         canvas.scale(scale3, scale3);
         canvas.rotate(mValue7 * 30f);
         canvas.drawCircle(0, 0, radius3, paintCircleHollow);
         canvas.restore();
 
-        paintCircleSolid.setColor(this.getContext().getResources().getColor(R.color.mask_bg_color));
-        paintCircleSolid.setAntiAlias(true);
         float radius = mValue6 * radiusMask;
         //绘制阴影圈
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.drawCircle(0, 0, radius, paintCircleSolid);
         canvas.restore();
 
-        paintCircleStar.setColor(this.getContext().getResources().getColor(R.color.star_color));
-        paintCircleStar.setAntiAlias(true);
-        //需关闭硬件加速才能生效
-        paintCircleStar.setMaskFilter(new BlurMaskFilter(10, BlurMaskFilter.Blur.SOLID));
-
-        paintText.setAntiAlias(true);
-        paintText.setTextSize(textSize);
-        paintText.setColor(Color.GRAY);
-        paintText.setTextAlign(Paint.Align.CENTER);
-
-        paintTextTmp.setAntiAlias(true);
-        paintTextTmp.setTextSize(textSize*mValue7);
-        paintTextTmp.setColor(Color.GRAY);
-        paintTextTmp.setTextAlign(Paint.Align.CENTER);
+        paintTextTmp.setTextSize(textSize * mValue7);
 
         canvas.save();
         setLayerType(LAYER_TYPE_SOFTWARE, null);//关闭硬件加速
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.scale(scale, scale);
         canvas.rotate(30f * mValue7);
         {
             //绘制内圈星星
+
+            float x = radius2 / 2;
+            float y = (float) Math.sqrt(3) / 2 * radius2;
             float tmpRadius = radiusStar / scale;
             canvas.drawCircle(-radius2, 0, tmpRadius, paintCircleStar);
             canvas.drawCircle(radius2, 0, tmpRadius, paintCircleStar);
-            canvas.drawCircle(-radius2 / 2, -(float) Math.sqrt(3) / 2 * radius2, tmpRadius, paintCircleStar);
-            canvas.drawCircle(-radius2 / 2, (float) Math.sqrt(3) / 2 * radius2, tmpRadius, paintCircleStar);
-            canvas.drawCircle(radius2 / 2, -(float) Math.sqrt(3) / 2 * radius2, tmpRadius, paintCircleStar);
-            canvas.drawCircle(radius2 / 2, (float) Math.sqrt(3) / 2 * radius2, tmpRadius, paintCircleStar);
+            canvas.drawCircle(-x, -y, tmpRadius, paintCircleStar);
+            canvas.drawCircle(-x, y, tmpRadius, paintCircleStar);
+            canvas.drawCircle(x, -y, tmpRadius, paintCircleStar);
+            canvas.drawCircle(x, y, tmpRadius, paintCircleStar);
         }
         canvas.restore();
 
         canvas.save();
         setLayerType(LAYER_TYPE_SOFTWARE, null);//关闭硬件加速
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.scale(scale3, scale3);
         canvas.rotate(30f * mValue7);
         {
             //绘制外圈星星
+            float x = (float) Math.sqrt(3) / 2 * radius3;
+            float y = radius3 / 2;
             float tmpRadius3 = radiusStar / scale;
             canvas.drawCircle(0, -radius3, tmpRadius3, paintCircleStar);
             canvas.drawCircle(0, radius3, tmpRadius3, paintCircleStar);
-            canvas.drawCircle(-(float) Math.sqrt(3) / 2 * radius3, -radius3 / 2, tmpRadius3, paintCircleStar);
-            canvas.drawCircle(-(float) Math.sqrt(3) / 2 * radius3, radius3 / 2, tmpRadius3, paintCircleStar);
-            canvas.drawCircle((float) Math.sqrt(3) / 2 * radius3, -radius3 / 2, tmpRadius3, paintCircleStar);
-            canvas.drawCircle((float) Math.sqrt(3) / 2 * radius3, radius3 / 2, tmpRadius3, paintCircleStar);
+            canvas.drawCircle(-x, -y, tmpRadius3, paintCircleStar);
+            canvas.drawCircle(-x, y, tmpRadius3, paintCircleStar);
+            canvas.drawCircle(x, -y, tmpRadius3, paintCircleStar);
+            canvas.drawCircle(x, y, tmpRadius3, paintCircleStar);
         }
         canvas.restore();
 
@@ -888,7 +938,7 @@ public class StarryView extends View {
         if (mValue7 > 0.01f) {
             canvas.save();
             setLayerType(LAYER_TYPE_SOFTWARE, null);//关闭硬件加速
-            canvas.translate(scwidth / 2, scheight / 2);
+            canvas.translate(halfWidth, halfHeight);
             canvas.scale(scale, scale);
             canvas.rotate(30f * mValue7);
 
@@ -897,50 +947,50 @@ public class StarryView extends View {
                 float tmpRadius = radiusStar * mValue7 / scale;
                 canvas.drawCircle(0, -radiusMask, tmpRadius, paintCircleStar);
                 canvas.drawCircle(0, radiusMask, tmpRadius, paintCircleStar);
-                canvas.drawCircle(-(float) Math.sqrt(3) / 2 * radiusMask, -radiusMask / 2, tmpRadius, paintCircleStar);
-                canvas.drawCircle(-(float) Math.sqrt(3) / 2 * radiusMask, radiusMask / 2, tmpRadius, paintCircleStar);
-                canvas.drawCircle((float) Math.sqrt(3) / 2 * radiusMask, -radiusMask / 2, tmpRadius, paintCircleStar);
-                canvas.drawCircle((float) Math.sqrt(3) / 2 * radiusMask, radiusMask / 2, tmpRadius, paintCircleStar);
+                canvas.drawCircle(-sqrtMask, -halfMask, tmpRadius, paintCircleStar);
+                canvas.drawCircle(-sqrtMask, halfMask, tmpRadius, paintCircleStar);
+                canvas.drawCircle(sqrtMask, -halfMask, tmpRadius, paintCircleStar);
+                canvas.drawCircle(sqrtMask, halfMask, tmpRadius, paintCircleStar);
             }
 
             canvas.restore();
 
             canvas.save();
-            canvas.translate(scwidth / 2, scheight / 2);
+            canvas.translate(halfWidth, halfHeight);
             //绘制新生内圈星星的名字
             float r = -radiusMask * scale;
 
-            canvas.drawText(appNameOuterTmp[(appNameIndex +0)%6], (float) (r * Math.cos((30 + a) * Math.PI / 180)), (float) (r * Math.sin((30 + a) * Math.PI / 180) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex +1)%6], (float) (r * Math.cos((90 + a) * Math.PI / 180)), (float) (r * Math.sin((90 + a) * Math.PI / 180) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex +2)%6], (float) (r * Math.cos((150 + a) * Math.PI / 180)), (float) (r * Math.sin((150 + a) * Math.PI / 180) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex +3)%6], (float) (r * Math.cos((210 + a) * Math.PI / 180)), (float) (r * Math.sin((210 + a) * Math.PI / 180) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex +4)%6], (float) (r * Math.cos((270 + a) * Math.PI / 180)), (float) (r * Math.sin((270 + a) * Math.PI / 180) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex +5)%6], (float) (r * Math.cos((330 + a) * Math.PI / 180)), (float) (r * Math.sin((330 + a) * Math.PI / 180) + textVer), paintTextTmp);
+            canvas.drawText(appNameOuterTmp[(appNameIndex + 0) % 6], (float) (r * Math.cos((30 + a) * Math.PI / 180)), (float) (r * Math.sin((30 + a) * Math.PI / 180) + textVer), paintTextTmp);
+            canvas.drawText(appNameOuterTmp[(appNameIndex + 1) % 6], (float) (r * Math.cos((90 + a) * Math.PI / 180)), (float) (r * Math.sin((90 + a) * Math.PI / 180) + textVer), paintTextTmp);
+            canvas.drawText(appNameOuterTmp[(appNameIndex + 2) % 6], (float) (r * Math.cos((150 + a) * Math.PI / 180)), (float) (r * Math.sin((150 + a) * Math.PI / 180) + textVer), paintTextTmp);
+            canvas.drawText(appNameOuterTmp[(appNameIndex + 3) % 6], (float) (r * Math.cos((210 + a) * Math.PI / 180)), (float) (r * Math.sin((210 + a) * Math.PI / 180) + textVer), paintTextTmp);
+            canvas.drawText(appNameOuterTmp[(appNameIndex + 4) % 6], (float) (r * Math.cos((270 + a) * Math.PI / 180)), (float) (r * Math.sin((270 + a) * Math.PI / 180) + textVer), paintTextTmp);
+            canvas.drawText(appNameOuterTmp[(appNameIndex + 5) % 6], (float) (r * Math.cos((330 + a) * Math.PI / 180)), (float) (r * Math.sin((330 + a) * Math.PI / 180) + textVer), paintTextTmp);
             canvas.restore();
 
         }
 
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         //绘制内圈星星名字
 
         float tmpRadius2 = -radius2 * scale;
         float tmpRadius3 = -radius3 * scale3;
 
-        canvas.drawText(appNameInnerTmp[(appNameIndex +0)%6], (float) (tmpRadius2 * Math.cos(a * Math.PI / 180)), (float) (tmpRadius2 * Math.sin(a * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameInnerTmp[(appNameIndex +1)%6], (float) (tmpRadius2 * Math.cos((60 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((60 + a) * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameInnerTmp[(appNameIndex +2)%6], (float) (tmpRadius2 * Math.cos((120 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((120 + a) * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameInnerTmp[(appNameIndex +3)%6], (float) (tmpRadius2 * Math.cos((180 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((180 + a) * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameInnerTmp[(appNameIndex +4)%6], (float) (tmpRadius2 * Math.cos((240 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((240 + a) * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameInnerTmp[(appNameIndex +5)%6], (float) (tmpRadius2 * Math.cos((300 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((300 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameInnerTmp[(appNameIndex + 0) % 6], (float) (tmpRadius2 * Math.cos(a * Math.PI / 180)), (float) (tmpRadius2 * Math.sin(a * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameInnerTmp[(appNameIndex + 1) % 6], (float) (tmpRadius2 * Math.cos((60 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((60 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameInnerTmp[(appNameIndex + 2) % 6], (float) (tmpRadius2 * Math.cos((120 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((120 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameInnerTmp[(appNameIndex + 3) % 6], (float) (tmpRadius2 * Math.cos((180 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((180 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameInnerTmp[(appNameIndex + 4) % 6], (float) (tmpRadius2 * Math.cos((240 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((240 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameInnerTmp[(appNameIndex + 5) % 6], (float) (tmpRadius2 * Math.cos((300 + a) * Math.PI / 180)), (float) (tmpRadius2 * Math.sin((300 + a) * Math.PI / 180) + textVer), paintText);
 
         //绘制外圈星星名字
-        canvas.drawText(appNameOuterTmp[(appNameIndex +0)%6], (float) (tmpRadius3 * Math.cos((30 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((30 + a) * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameOuterTmp[(appNameIndex +1)%6], (float) (tmpRadius3 * Math.cos((90 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((90 + a) * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameOuterTmp[(appNameIndex +2)%6], (float) (tmpRadius3 * Math.cos((150 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((150 + a) * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameOuterTmp[(appNameIndex +3)%6], (float) (tmpRadius3 * Math.cos((210 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((210 + a) * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameOuterTmp[(appNameIndex +4)%6], (float) (tmpRadius3 * Math.cos((270 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((270 + a) * Math.PI / 180) + textVer), paintText);
-        canvas.drawText(appNameOuterTmp[(appNameIndex +5)%6], (float) (tmpRadius3 * Math.cos((330 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((330 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameOuterTmp[(appNameIndex + 0) % 6], (float) (tmpRadius3 * Math.cos((30 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((30 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameOuterTmp[(appNameIndex + 1) % 6], (float) (tmpRadius3 * Math.cos((90 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((90 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameOuterTmp[(appNameIndex + 2) % 6], (float) (tmpRadius3 * Math.cos((150 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((150 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameOuterTmp[(appNameIndex + 3) % 6], (float) (tmpRadius3 * Math.cos((210 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((210 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameOuterTmp[(appNameIndex + 4) % 6], (float) (tmpRadius3 * Math.cos((270 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((270 + a) * Math.PI / 180) + textVer), paintText);
+        canvas.drawText(appNameOuterTmp[(appNameIndex + 5) % 6], (float) (tmpRadius3 * Math.cos((330 + a) * Math.PI / 180)), (float) (tmpRadius3 * Math.sin((330 + a) * Math.PI / 180) + textVer), paintText);
 
         canvas.restore();
 
@@ -948,7 +998,7 @@ public class StarryView extends View {
         if (mValue7 == mValueMax) {
 
             canvas.save();
-            canvas.translate(scwidth / 2, scheight / 2);
+            canvas.translate(halfWidth, halfHeight);
 
             float tmpRadius = radiusStar;
             canvas.drawCircle(-radius2, 0, tmpRadius, paintCircleStar);
@@ -976,12 +1026,12 @@ public class StarryView extends View {
 
         //绘制星团
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
 
         Rect src_bg = new Rect(0, 0, particallevel1.getWidth(), particallevel1.getHeight());
         float scale = (mValue8 * 2f) + 4; // 缩放比例 1 - 6
-        float tempX = scwidth / 2 * scale;
-        float tempY = scheight / 2 * scale;
+        float tempX = halfWidth * scale;
+        float tempY = halfHeight * scale;
         RectF dst_bg = new RectF(-tempX, -tempY, tempX, tempY);
 
         canvas.drawBitmap(particallevel2, src_bg, dst_bg, paintBg);//共用背景画笔,保持对比度一致
@@ -998,10 +1048,7 @@ public class StarryView extends View {
      */
     private void drawState9(Canvas canvas) {
         //绘制小水波纹
-        paintWave1.setColor(this.getContext().getResources().getColor(R.color.wave_color));
-        paintWave1.setStrokeWidth(circleStroke);
-        paintWave1.setStyle(Paint.Style.STROKE);
-        paintWave1.setAntiAlias(true);
+
         int alpha = 255;
 
         float x = 0;
@@ -1067,34 +1114,25 @@ public class StarryView extends View {
         canvas.save();
         float scale1 = (mValue9 * 1f / 100) + 1;         // 缩放比例 1 - 2
         float scale2 = (mValue9 * 1.6f / 100) + 1;         // 缩放比例 1 - 2
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.drawCircle(x, y, radiusAppWave, paintWave1);
         canvas.restore();
 
-        paintWave1.setAlpha(alpha);
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.drawCircle(x, y, (radiusAppWave - 8) * scale2, paintWave1);
         canvas.restore();
 
-        paintWave1.setAlpha(alpha);
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.drawCircle(x, y, (radiusAppWave) * scale1, paintWave1);
         canvas.restore();
 
         paintWave1.setAlpha(alpha / 2);
         canvas.save();
-        canvas.translate(scwidth / 2, scheight / 2);
+        canvas.translate(halfWidth, halfHeight);
         canvas.drawCircle(x, y, (radiusAppWave + 8) * scale1, paintWave1);
         canvas.restore();
-
-
-        /*paintWave1.setAlpha(255/4);
-        canvas.save();
-        canvas.translate(scwidth/2,scheight/2);
-        canvas.drawCircle(-radiusSm, 0, (radiusAppWave+16)*scale1, paintWave1);
-        canvas.restore();*/
 
     }
 
