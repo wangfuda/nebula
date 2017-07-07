@@ -20,4 +20,3 @@ CPU运算/GPU渲染性能优化的讲解：[nebula自定义动画及GPU渲染性
 ![](https://github.com/wangfuda/nebula/blob/master/screenshots/2.png)
 ![](https://github.com/wangfuda/nebula/blob/master/screenshots/3.png)
 ![](https://github.com/wangfuda/nebula/blob/master/screenshots/4.png)
-![](https://github.com/wangfuda/nebula/blob/master/screenshots/5.png)
