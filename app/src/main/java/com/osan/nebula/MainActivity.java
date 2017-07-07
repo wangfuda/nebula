@@ -38,5 +38,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         starryView.stopAnimation();
+        starryView.releaseBitmap();
+        starryView.releaseBitmapEx();
     }
 }

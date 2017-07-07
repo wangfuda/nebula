@@ -364,17 +364,30 @@ public class StarryView extends View {
     /**
      * 图片资源释放
      */
-    private void releaseBitmap() {
-        vortex.recycle();
+    public void releaseBitmap() {
+        if (vortex != null) vortex.recycle();
         vortex = null;
-        sky_layer1.recycle();
+        if (sky_layer1 != null) sky_layer1.recycle();
         sky_layer1 = null;
-        sky_layer2.recycle();
+        if (sky_layer2 != null) sky_layer2.recycle();
         sky_layer2 = null;
-        light.recycle();
+        if (light != null) light.recycle();
         light = null;
 
     }
+
+    /**
+     * 图片资源释放
+     */
+    public void releaseBitmapEx() {
+        if (bg != null) bg.recycle();
+        bg = null;
+        if (particallevel1 != null) particallevel1.recycle();
+        particallevel1 = null;
+
+    }
+
+
 
     /**
      * 简化动画, 简化为一个ValueAnimator
