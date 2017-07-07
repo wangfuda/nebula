@@ -1,19 +1,18 @@
 # nebula
+>一个关于星空的自定义动画Sample
 
-**一个关于星空的自定义动画的Sample**
 
-- - -
 
 Sample中自定义动画实现及
 CPU运算/GPU渲染性能优化的讲解：[nebula自定义动画及GPU渲染性能优化手记](https://wangfuda.github.io/)
 
-- - -
+
 
 自定义动画nebula的Gif图：
 
 ![](https://github.com/wangfuda/nebula/blob/master/screenshots/nebula.gif)
 
-- - -
+
 
 自定义动画nebula的截图：
 
