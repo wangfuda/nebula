@@ -1069,13 +1069,6 @@ public class StarryView extends View {
             canvas.translate(halfWidth, halfHeight);
             float r = -radiusMask * scale;
 
-            /*canvas.drawText(appNameOuterTmp[(appNameIndex + 0) % 6], (float) (r * Math.cos((30 + a) * pi)), (float) (r * Math.sin((30 + a) * pi) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 1) % 6], (float) (r * Math.cos((90 + a) * pi)), (float) (r * Math.sin((90 + a) * pi) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 2) % 6], (float) (r * Math.cos((150 + a) * pi)), (float) (r * Math.sin((150 + a) * pi) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 3) % 6], (float) (r * Math.cos((210 + a) * pi)), (float) (r * Math.sin((210 + a) * pi) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 4) % 6], (float) (r * Math.cos((270 + a) * pi)), (float) (r * Math.sin((270 + a) * pi) + textVer), paintTextTmp);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 5) % 6], (float) (r * Math.cos((330 + a) * pi)), (float) (r * Math.sin((330 + a) * pi) + textVer), paintTextTmp);*/
-
             for (int i = 0; i < 6; i++) {
                 canvas.drawText(appNameOuterTmp[(appNameIndex + i) % 6], (float) (r * Math.cos((30 + 60 * i + a) * pi)), (float) (r * Math.sin((30 + 60 * i + a) * pi) + textVer), paintTextTmp);
             }
@@ -1091,24 +1084,12 @@ public class StarryView extends View {
             for (int i = 0; i < 6; i++) {
                 canvas.drawText(appNameInnerTmp[(appNameIndex + i) % 6], (float) (tmpRadius2 * Math.cos((60 * i + a) * pi)), (float) (tmpRadius2 * Math.sin((60 * i + a) * pi) + textVer), paintText);
             }
-            /*canvas.drawText(appNameInnerTmp[(appNameIndex + 0) % 6], (float) (tmpRadius2 * Math.cos(a * pi)), (float) (tmpRadius2 * Math.sin(a * pi) + textVer), paintText);
-            canvas.drawText(appNameInnerTmp[(appNameIndex + 1) % 6], (float) (tmpRadius2 * Math.cos((60 + a) * pi)), (float) (tmpRadius2 * Math.sin((60 + a) * pi) + textVer), paintText);
-            canvas.drawText(appNameInnerTmp[(appNameIndex + 2) % 6], (float) (tmpRadius2 * Math.cos((120 + a) * pi)), (float) (tmpRadius2 * Math.sin((120 + a) * pi) + textVer), paintText);
-            canvas.drawText(appNameInnerTmp[(appNameIndex + 3) % 6], (float) (tmpRadius2 * Math.cos((180 + a) * pi)), (float) (tmpRadius2 * Math.sin((180 + a) * pi) + textVer), paintText);
-            canvas.drawText(appNameInnerTmp[(appNameIndex + 4) % 6], (float) (tmpRadius2 * Math.cos((240 + a) * pi)), (float) (tmpRadius2 * Math.sin((240 + a) * pi) + textVer), paintText);
-            canvas.drawText(appNameInnerTmp[(appNameIndex + 5) % 6], (float) (tmpRadius2 * Math.cos((300 + a) * pi)), (float) (tmpRadius2 * Math.sin((300 + a) * pi) + textVer), paintText);
-*/
+
             //绘制外圈星星名字
 
             for (int i = 0; i < 6; i++) {
                 canvas.drawText(appNameOuterTmp[(appNameIndex + i) % 6], (float) (tmpRadius3 * Math.cos((30 + 60 * i + a) * pi)), (float) (tmpRadius3 * Math.sin((30 + 60 * i + a) * pi) + textVer), paintText);
             }
-            /*canvas.drawText(appNameOuterTmp[(appNameIndex + 0) % 6], (float) (tmpRadius3 * Math.cos((30 + a) * pi)), (float) (tmpRadius3 * Math.sin((30 + a) * pi) + textVer), paintText);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 1) % 6], (float) (tmpRadius3 * Math.cos((90 + a) * pi)), (float) (tmpRadius3 * Math.sin((90 + a) * pi) + textVer), paintText);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 2) % 6], (float) (tmpRadius3 * Math.cos((150 + a) * pi)), (float) (tmpRadius3 * Math.sin((150 + a) * pi) + textVer), paintText);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 3) % 6], (float) (tmpRadius3 * Math.cos((210 + a) * pi)), (float) (tmpRadius3 * Math.sin((210 + a) * pi) + textVer), paintText);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 4) % 6], (float) (tmpRadius3 * Math.cos((270 + a) * pi)), (float) (tmpRadius3 * Math.sin((270 + a) * pi) + textVer), paintText);
-            canvas.drawText(appNameOuterTmp[(appNameIndex + 5) % 6], (float) (tmpRadius3 * Math.cos((330 + a) * pi)), (float) (tmpRadius3 * Math.sin((330 + a) * pi) + textVer), paintText);*/
             canvas.restore();
         }
 
