@@ -14,7 +14,7 @@ before_install:
 
 script:
   - "./gradlew assembleDebug"
-    
+
 deploy:
   provider: releases
   api_key:7834a8977165fe7b973c2391aabd85c3efeeab82
