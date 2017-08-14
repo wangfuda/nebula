@@ -9,8 +9,16 @@ android:
   - extra-android-m2repository
   - extra-android-support
 
-script:
-  - "./gradlew assembleRelease"
-  
 before_install:
  - chmod +x gradlew
+
+script:
+  - "./gradlew assembleDebug"
+    
+deploy:
+  provider: releases
+  api_key: 426c51dc3eb12b7a1240fc699af1e3a175d88216
+  file: app/build/outputs/apk/app-debug.apk
+  skip_cleanup: true
+  on:
+    tags: true
