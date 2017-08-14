@@ -22,5 +22,5 @@ deploy:
   file: app/build/outputs/apk/app-debug.apk
   skip_cleanup: true
   on:
-    tags: false
+    tags: true
     all_branches: true
