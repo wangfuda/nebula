@@ -19,7 +19,7 @@ deploy:
   provider: releases
   api_key:
     secure: dNe8wT18YscrzaAW9nsX
-  file: app/build/outputs/apk/app-release.apk
+  file: app/build/outputs/app-release-unsigned.apk
   skip_cleanup: true
   on:
     tags: true
