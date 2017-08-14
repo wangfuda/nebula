@@ -19,5 +19,6 @@ allprojects {
 }
 
 task clean(type: Delete) {
+    println ">>> rootProject.buildDir: ${rootProject.buildDir}"
     delete rootProject.buildDir
 }
