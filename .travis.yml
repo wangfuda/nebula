@@ -17,7 +17,7 @@ script:
     
 deploy:
   provider: releases
-  api_key: 426c51dc3eb12b7a1240fc699af1e3a175d88216
+  api_key: 7834a8977165fe7b973c2391aabd85c3efeeab82
   file: app/build/outputs/apk/app-debug.apk
   skip_cleanup: true
   on:
