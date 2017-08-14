@@ -1,8 +1,6 @@
 # nebula
 ==========
-[![Build Status](https://travis-ci.org/wangfuda/nebula/DataMining.svg?branches=master)](https://travis-ci.org/wangfuda/nebula)
-
-#My data mining code！Written by python.
+[![Build Status](https://travis-ci.org/wangfuda/nebula.svg?branch=master)](https://travis-ci.org/wangfuda/nebula)
 >一个关于星空的自定义动画Sample
 
 
