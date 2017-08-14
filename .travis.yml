@@ -19,7 +19,7 @@ deploy:
   provider: releases
   user: "wangfuda"
   password: "a123456"
-  file: app/build/outputs/apk/app-release.apk
+  file: app/build/outputs/apk/app-debug.apk
   skip_cleanup: true
   on:
     tags: true
