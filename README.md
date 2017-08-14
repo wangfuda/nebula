@@ -1,5 +1,4 @@
 # nebula
-==========
 [![Build Status](https://travis-ci.org/wangfuda/nebula.svg?branch=master)](https://travis-ci.org/wangfuda/nebula)
 >一个关于星空的自定义动画Sample
 
