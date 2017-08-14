@@ -13,13 +13,14 @@ before_install:
  - chmod +x gradlew
 
 script:
-  - "./gradlew assembleRelease"
+  - "./gradlew assembleDebug"
 
 deploy:
   provider: releases
-  user: "wangfuda"
-  password: "a123456"
+  api_key:
+    secure: 426c51dc3eb12b7a1240fc699af1e3a175d88216
   file: app/build/outputs/apk/app-debug.apk
   skip_cleanup: true
   on:
     tags: true
+    all_branches: true
