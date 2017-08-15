@@ -17,5 +17,5 @@ deploy:
   file: app/build/outputs/app-debug.apk
   skip_cleanup: true
   on:
-	tags: true
+    tags: true
     repo: wangfuda/nebula
